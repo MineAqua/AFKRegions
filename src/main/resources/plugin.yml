@@ -1,0 +1,13 @@
+name: AFKRegions
+main: com.afkregions.AFKRegionsPlugin
+version: 1.0.0
+author: Jaimexo
+softdepend: [PlaceholderAPI]
+commands:
+  afkregions:
+    description: Gestiona regiones AFK
+    usage: "/afkregions <create|pos1|pos2|addreward|list|remove|reload>"
+    aliases: [afkr]
+permissions:
+  afkregions.admin:
+    default: op

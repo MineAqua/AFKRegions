@@ -1,0 +1,11 @@
+settings:
+  debug: true
+  titles_enabled: true
+  titles_enter_exit: false    # ← NO mostrar títulos al entrar/salir
+  title_every_seconds: 1      # ← cada cuántos segundos enviar el título (0 = desactivado)
+  reset_on_exit: true
+  tick_interval: 20 # ticks, 20 = 1s
+  bossbar_enabled: true
+  bossbar_title: "&bAFK &7en &f{region}&7 — &b{elapsed}&7/&f{max} &7({progress%}%)"
+  bossbar_color: "BLUE"   # BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
+  bossbar_style: "SEGMENTED_10"

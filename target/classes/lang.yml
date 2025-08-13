@@ -1,0 +1,47 @@
+# ────────────────
+# 🔹 General
+# ────────────────
+prefix: "&8[&bAFK&7Regions&8]&r "
+no_perm: "&cNo tienes permisos."
+invalid_args: "&cArgumentos inválidos. Usa &e/afkregions help"
+region_not_found: "&cNo existe la región &f{region}&c."
+reloaded: "&aConfiguración recargada."
+
+# ────────────────
+# 🔹 Gestión de regiones
+# ────────────────
+created_region: "&aRegión &f{region}&a creada correctamente."
+removed_region: "&cRegión &f{region}&c eliminada."
+list_header: "&7Regiones (&f{count}&7):"
+list_item: " &8- &f{name}&7 @ &f{world}&7 [{min} → {max}] &7/ &f{duration}s &7/ rewards: &f{rewards}"
+
+# ────────────────
+# 🔹 Eventos de entrada/salida
+# ────────────────
+entered_region: "&7Has entrado a la región &f{region}&7."
+left_region: "&7Has salido de la región &f{region}&7."
+enter_title:
+  title: "&bAFK iniciado"
+  subtitle: "&7Región &f{region}"
+  fadeIn: 5
+  stay: 30
+  fadeOut: 10
+exit_title:
+  title: "&cAFK detenido"
+  subtitle: "&7Has salido de &f{region}"
+  fadeIn: 5
+  stay: 30
+  fadeOut: 10
+
+# ────────────────
+# 🔹 Recompensas
+# ────────────────
+added_reward: "&aReward agregado a &f{region}&a: &e{spec}"
+reward_given: "&a¡Has recibido una recompensa! &7({command})"
+
+# ────────────────
+# 🔹 Progreso
+# ────────────────
+progress_title:
+  title: "&bAFK &7{elapsed}/{max}"
+  subtitle: "&7Región &f{region}&7 — &f{progress%}%"
