@@ -51,11 +51,11 @@ public class AFKRegionsPlugin extends JavaPlugin {
 
     if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
       new AFKRegionsExpansion(this).register();
-      getLogger().info("PlaceholderAPI detectado — placeholders registrados.");
+      getLogger().info("PlaceholderAPI detected — registering placeholders.");
     }
 
     tracker.start();
-    getLogger().info("AFKRegions habilitado.");
+    getLogger().info("AFKRegions enabled.");
   }
 
   @Override public void onDisable() {
@@ -104,9 +104,9 @@ public class AFKRegionsPlugin extends JavaPlugin {
       }
 
       out.save(regionsFile);
-      getLogger().info("Guardado regions.yml (" + regionsFile.getAbsolutePath() + ")");
+      getLogger().info("Saving regions.yml (" + regionsFile.getAbsolutePath() + ")");
     } catch (Exception e) {
-      getLogger().warning("No pude guardar regions.yml: " + e.getMessage());
+      getLogger().warning("Cannot save regions.yml: " + e.getMessage());
     }
   }
 

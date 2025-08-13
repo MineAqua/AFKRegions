@@ -3,7 +3,6 @@ package com.afkregions.cmd;
 
 import com.afkregions.AFKRegionsPlugin;
 import com.afkregions.model.Region;
-import com.afkregions.model.RegionReward;
 import com.afkregions.selection.SelectionListener;
 import com.afkregions.selection.SelectionManager;
 import org.bukkit.command.Command;
@@ -21,11 +20,11 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
 
   @Override public boolean onCommand(CommandSender s, Command cmd, String label, String[] args) {
     if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-      s.sendMessage("§b/afkregions wand §7– Seleccionar región (izq=pos1, der=pos2)");
-      s.sendMessage("§b/afkregions create <nombre> <duración_s> §7– Crear región con tu selección");
-      s.sendMessage("§b/afkregions reward list <región>");
-      s.sendMessage("§b/afkregions reward add <región> <porcentaje%> <tiempo_s> <comando...>");
-      s.sendMessage("§b/afkregions reward remove <región> <índice>");
+      s.sendMessage("§b/afkregions wand §7– Select region (izq=pos1, der=pos2)");
+      s.sendMessage("§b/afkregions create <name> <duration_s> §7– Create a region with the selection");
+      s.sendMessage("§b/afkregions reward list <region>");
+      s.sendMessage("§b/afkregions reward add <region> <percentage%> <time_> <command...>");
+      s.sendMessage("§b/afkregions reward remove <region> <index>");
       s.sendMessage("§b/afkregions reload");
       return true;
     }
@@ -36,10 +35,10 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
 
     // wand
     if (sub.equals("wand")) {
-      if (!(s instanceof Player)) { s.sendMessage("§cSolo jugadores."); return true; }
+      if (!(s instanceof Player)) { s.sendMessage("§cJust players."); return true; }
       Player p = (Player)s;
       p.getInventory().addItem(SelectionListener.makeWand());
-      p.sendMessage("§aHacha entregada. §7Clic izquierdo = Pos1, clic derecho = Pos2.");
+      p.sendMessage("§aYou got the wand. §7Left clic = Pos1, right clic= Pos2.");
       return true;
     }
 
@@ -49,11 +48,11 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
       Player p = (Player)s; String name = args[1]; int dur = parseInt(args[2], 600);
       SelectionManager.Sel sel = plugin.selections().peek(p.getUniqueId());
       if (sel == null || sel.p1 == null || sel.p2 == null) {
-        s.sendMessage("§cDebes seleccionar pos1 y pos2 con §e/"+label+" wand§c.");
+        s.sendMessage("§cYou must select Pos1 and Pos2 first using §e/"+label+" wand§c.");
         return true;
       }
       if (!sel.p1.getWorld().equals(sel.p2.getWorld()) || !sel.p1.getWorld().equals(p.getWorld())) {
-        s.sendMessage("§cPos1 y Pos2 deben estar en el mismo mundo que tú.");
+        s.sendMessage("§cPos1 and Pos2 must be in the same world as you.");
         return true;
       }
       Region r = new Region(name, p.getWorld().getName(), sel.p1.getBlockX(), sel.p1.getBlockY(), sel.p1.getBlockZ(),
@@ -81,14 +80,14 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
 
       // ---- LIST ----
       if (action.equals("list")) {
-        if (args.length < 3) { s.sendMessage("§cUso: /afkregions reward list <región>"); return true; }
+        if (args.length < 3) { s.sendMessage("§cUse: /afkregions reward list <region>"); return true; }
         String regionName = args[2];
         com.afkregions.model.Region r = plugin.regions().get(regionName);
         if (r == null) { s.sendMessage(plugin.messages().msg("region_not_found").replace("{region}", regionName)); return true; }
 
         java.util.List<com.afkregions.model.RegionReward> L = r.rewards;
-        if (L == null || L.isEmpty()) { s.sendMessage("§7No hay rewards en §e" + r.name + "§7."); return true; }
-        s.sendMessage("§aRewards en §e" + r.name + "§a:");
+        if (L == null || L.isEmpty()) { s.sendMessage("§7There is no rewards in §e" + r.name + "§7."); return true; }
+        s.sendMessage("§aRewards in §e" + r.name + "§a:");
         for (int i = 0; i < L.size(); i++) {
           com.afkregions.model.RegionReward rr = L.get(i);
           String when = rr.always ? "always" : (rr.atSeconds + "s");
@@ -101,7 +100,7 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
       // ---- ADD ----
       if (action.equals("add")) {
         if (args.length < 6) {
-          s.sendMessage("§cUso: /afkregions reward add <región> <porcentaje%> <tiempo_s> <comando...>");
+          s.sendMessage("§cUse: /afkregions reward add <region> <percentage%> <time_s> <command...>");
           return true;
         }
         String regionName = args[2];
@@ -110,26 +109,26 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
 
         // porcentaje%
         String percentTok = args[3];
-        if (!percentTok.endsWith("%")) { s.sendMessage("§cEl porcentaje debe terminar en % (ej: 100%)."); return true; }
+        if (!percentTok.endsWith("%")) { s.sendMessage("§cThe percentage must finish with % (ex: 100%)."); return true; }
         double chance;
         try {
           chance = Math.max(0, Math.min(1, Double.parseDouble(percentTok.substring(0, percentTok.length()-1)) / 100.0));
         } catch (Exception ex) {
-          s.sendMessage("§cPorcentaje inválido."); return true;
+          s.sendMessage("§cInvalid percentage."); return true;
         }
 
         // tiempo en segundos: 10s
         String timeTok = args[4].toLowerCase(java.util.Locale.ROOT);
-        if (!timeTok.endsWith("s")) { s.sendMessage("§cEl tiempo debe terminar en 's' (segundos), ej: 10s."); return true; }
+        if (!timeTok.endsWith("s")) { s.sendMessage("§cThe time must ends with 's' (seconds), ex: 10s."); return true; }
         int at;
         try { at = Integer.parseInt(timeTok.substring(0, timeTok.length()-1)); }
-        catch (Exception ex) { s.sendMessage("§cTiempo inválido."); return true; }
-        if (at < 0) { s.sendMessage("§cEl tiempo debe ser >= 0."); return true; }
+        catch (Exception ex) { s.sendMessage("§cInvalid time."); return true; }
+        if (at < 0) { s.sendMessage("§cThe time must be greather than 0 (seconds)."); return true; }
 
         // comando
         String command = join(args, 5);
-        if (command.startsWith("bc ")) command = "broadcast " + command.substring(3);
-        if (command.equalsIgnoreCase("bc")) { s.sendMessage("§cEspecifica el texto de broadcast luego de 'bc'."); return true; }
+//        if (command.startsWith("bc ")) command = "broadcast " + command.substring(3);
+//        if (command.equalsIgnoreCase("bc")) { s.sendMessage("§cEspecifica el texto de broadcast luego de 'bc'."); return true; }
 
         // agregar en sitio (lista mutable)
         r.rewards.add(new com.afkregions.model.RegionReward(false, at, chance, command));
@@ -146,18 +145,18 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
 
       // ---- REMOVE ----
       if (action.equals("remove")) {
-        if (args.length < 4) { s.sendMessage("§cUso: /afkregions reward remove <región> <índice>"); return true; }
+        if (args.length < 4) { s.sendMessage("§cUse: /afkregions reward remove <region> <index>"); return true; }
         String regionName = args[2];
         com.afkregions.model.Region r = plugin.regions().get(regionName);
         if (r == null) { s.sendMessage(plugin.messages().msg("region_not_found").replace("{region}", regionName)); return true; }
 
         int index1;
         try { index1 = Integer.parseInt(args[3]); } catch (Exception e) {
-          s.sendMessage("§cÍndice inválido."); return true;
+          s.sendMessage("§cInvalid index."); return true;
         }
         int idx = index1 - 1;
         if (idx < 0 || idx >= r.rewards.size()) {
-          s.sendMessage("§cFuera de rango. Usa §e/afkregions reward list " + r.name);
+          s.sendMessage("§cIndex out of bounds. Use §e/afkregions reward list " + r.name);
           return true;
         }
 
@@ -167,11 +166,11 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
 
         String when = removed.always ? "always" : (removed.atSeconds + "s");
         int chancePct = (int)Math.round(removed.chance * 100.0);
-        s.sendMessage("§aEliminada reward §8#" + index1 + " §7(at=" + when + ", chance=" + chancePct + "%).");
+        s.sendMessage("§aDeleted reward §8#" + index1 + " §7(at=" + when + ", chance=" + chancePct + "%).");
         return true;
       }
 
-      s.sendMessage("§cSubcomando inválido. Usa: list, add, remove.");
+      s.sendMessage("§cInvalid subcommand. Use: list, add, remove.");
       return true;
     }
 

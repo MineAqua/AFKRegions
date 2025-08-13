@@ -46,7 +46,7 @@ public class RegionManager {
   private void saveRegions() {
     try { regionsCfg.save(regionsFile); }
     catch (Exception e) {
-      plugin.getLogger().severe("No se pudo guardar regions.yml: " + e.getMessage());
+      plugin.getLogger().severe("Cannot save regions.yml: " + e.getMessage());
     }
   }
 
