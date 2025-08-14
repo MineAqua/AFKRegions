@@ -1,6 +1,8 @@
 <img width="800" height="300" alt="afkregions" src="https://github.com/user-attachments/assets/5349de94-0f04-465b-aa51-2125d9864100" />
+
 # AFKRegions
 **AFKRegions** is a Spigot/Paper plugin that detects when a player is inside a specific region and, after a configurable amount of time, automatically executes rewards (commands). Perfect for AFK reward systems, mini-games, events, or waiting areas.
+
 ## 📌 Features
 
 - Define regions with commands.
