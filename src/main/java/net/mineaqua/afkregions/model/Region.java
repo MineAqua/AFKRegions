@@ -1,16 +1,16 @@
 
-package com.afkregions.model;
+package net.mineaqua.afkregions.model;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
 public class Region {
-    public final String name;
-    public final String world;
-    public final int minX, minY, minZ, maxX, maxY, maxZ;
-    public final int durationSeconds;
-    public List<RegionReward> rewards;
+    private final String name;
+    private final String world;
+    private final int minX, minY, minZ, maxX, maxY, maxZ;
+    private final int durationSeconds;
+    private List<RegionReward> rewards;
 
     public Region(String name, String world, int minX, int minY, int minZ,
                   int maxX, int maxY, int maxZ, int durationSeconds,
@@ -52,5 +52,45 @@ public class Region {
         return new Region(name, world,
                 p1.getInt("x"), p1.getInt("y"), p1.getInt("z"),
                 p2.getInt("x"), p2.getInt("y"), p2.getInt("z"), d, list);
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String world() {
+        return world;
+    }
+
+    public int minX() {
+        return minX;
+    }
+
+    public int minY() {
+        return minY;
+    }
+
+    public int minZ() {
+        return minZ;
+    }
+
+    public int maxX() {
+        return maxX;
+    }
+
+    public int maxY() {
+        return maxY;
+    }
+
+    public int maxZ() {
+        return maxZ;
+    }
+
+    public int durationSeconds() {
+        return durationSeconds;
+    }
+
+    public List<RegionReward> rewards() {
+        return rewards;
     }
 }

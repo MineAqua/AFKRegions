@@ -1,9 +1,13 @@
 
-package com.afkregions.region;
+package net.mineaqua.afkregions.region;
 
-import com.afkregions.model.Region;
+import net.mineaqua.afkregions.model.Region;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Índice espacial por chunk (16x16) para minimizar escaneos.
@@ -16,9 +20,11 @@ public class ChunkIndex {
     }
 
     public void add(Region r) {
-        Map<Long, List<Region>> map = byWorldChunk.computeIfAbsent(r.world, k -> new HashMap<>());
-        int cminX = floorDiv(r.minX, 16), cmaxX = floorDiv(r.maxX, 16);
-        int cminZ = floorDiv(r.minZ, 16), cmaxZ = floorDiv(r.maxZ, 16);
+        Map<Long, List<Region>> map = byWorldChunk.computeIfAbsent(r.world(), k -> new HashMap<>());
+
+        int cminX = floorDiv(r.minX(), 16), cmaxX = floorDiv(r.maxX(), 16);
+        int cminZ = floorDiv(r.minZ(), 16), cmaxZ = floorDiv(r.maxZ(), 16);
+
         for (int cx = cminX; cx <= cmaxX; cx++) {
             for (int cz = cminZ; cz <= cmaxZ; cz++) {
                 long key = key(cx, cz);
@@ -29,9 +35,13 @@ public class ChunkIndex {
 
     public List<Region> candidates(String world, int bx, int bz) {
         Map<Long, List<Region>> map = byWorldChunk.get(world);
-        if (map == null) return Collections.emptyList();
+        if (map == null) {
+            return Collections.emptyList();
+        }
+
         long k = key(floorDiv(bx, 16), floorDiv(bz, 16));
         List<Region> list = map.get(k);
+
         return list == null ? Collections.emptyList() : list;
     }
 

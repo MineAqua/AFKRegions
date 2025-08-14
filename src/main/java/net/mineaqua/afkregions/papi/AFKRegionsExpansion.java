@@ -1,9 +1,12 @@
 
-package com.afkregions.papi;
+package net.mineaqua.afkregions.papi;
 
-import com.afkregions.AFKRegionsPlugin;
+import net.mineaqua.afkregions.AFKRegionsPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class AFKRegionsExpansion extends PlaceholderExpansion {
     private final AFKRegionsPlugin plugin;
@@ -28,13 +31,15 @@ public class AFKRegionsExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public String onPlaceholderRequest(org.bukkit.entity.Player p, @org.jetbrains.annotations.NotNull String params) {
-        if (p == null) return "";
-        String k = params.toLowerCase();
-        java.util.UUID id = p.getUniqueId();
+    public String onPlaceholderRequest(Player player, @NotNull String params) {
+        if (player == null) {
+            return "";
+        }
 
-        switch (k) {
-            // existentes
+        String key = params.toLowerCase();
+        UUID id = player.getUniqueId();
+
+        switch (key) {
             case "is_afk":
                 return String.valueOf(plugin.tracker().isAfk(id));
             case "region_name":
@@ -42,7 +47,6 @@ public class AFKRegionsExpansion extends PlaceholderExpansion {
             case "time":
                 return String.valueOf(plugin.tracker().elapsedSeconds(id));  // segundos actuales
 
-            // NUEVOS (funcionando)
             case "duration":
                 return String.valueOf(plugin.tracker().durationSeconds(id)); // duración total (s)
             case "progress":
@@ -54,7 +58,7 @@ public class AFKRegionsExpansion extends PlaceholderExpansion {
 
             default:
                 // Fallback a los placeholders “viejos” que mantengas en tracker.placeholder(...)
-                return plugin.tracker().placeholder(id, k);
+                return plugin.tracker().placeholder(id, key);
         }
     }
 
