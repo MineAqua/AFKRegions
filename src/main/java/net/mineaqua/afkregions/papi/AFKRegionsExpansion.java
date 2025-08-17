@@ -1,4 +1,3 @@
-
 package net.mineaqua.afkregions.papi;
 
 import net.mineaqua.afkregions.AFKRegionsPlugin;
@@ -50,16 +49,34 @@ public class AFKRegionsExpansion extends PlaceholderExpansion {
             case "duration":
                 return String.valueOf(plugin.tracker().durationSeconds(id)); // duración total (s)
             case "progress":
-                return String.valueOf(plugin.tracker().progressPercent(id)); // 0..100
+            case "progress_percent":
+                return String.valueOf(plugin.tracker().progressPercent(id));
             case "progress_bar":
-                return plugin.tracker().progressBar(id);                     // barra textual
+                return plugin.tracker().progressBar(id);
             case "time_left":
-                return String.valueOf(plugin.tracker().timeLeftSeconds(id)); // segundos restantes
+                return String.valueOf(plugin.tracker().timeLeftSeconds(id));
+
+            // Nuevos placeholders para estadísticas
+            case "total_afk_seconds":
+                return String.valueOf(plugin.statistics().getTotalAFKSeconds(id));
+            case "total_afk_time":
+                return formatTime(plugin.statistics().getTotalAFKSeconds(id));
+            case "total_afk_hours":
+                return String.valueOf(plugin.statistics().getTotalAFKSeconds(id) / 3600);
+            case "total_afk_minutes":
+                return String.valueOf(plugin.statistics().getTotalAFKSeconds(id) / 60);
 
             default:
-                // Fallback a los placeholders “viejos” que mantengas en tracker.placeholder(...)
-                return plugin.tracker().placeholder(id, key);
+                return "";
         }
+    }
+
+    private String formatTime(long totalSeconds) {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        return String.format("%02dh %02dm %02ds", hours, minutes, seconds);
     }
 
 

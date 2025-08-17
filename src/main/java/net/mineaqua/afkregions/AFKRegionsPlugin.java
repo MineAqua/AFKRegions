@@ -1,6 +1,7 @@
-
 package net.mineaqua.afkregions;
 
+import net.mineaqua.afkregions.database.DatabaseManager;
+import net.mineaqua.afkregions.database.StatisticsManager;
 import net.mineaqua.afkregions.papi.AFKRegionsExpansion;
 import net.mineaqua.afkregions.region.RegionManager;
 import net.mineaqua.afkregions.runtime.PlayerTracker;
@@ -18,13 +19,12 @@ public class AFKRegionsPlugin extends JavaPlugin {
     private static AFKRegionsPlugin instance;
 
     private Messages messages;
-
     private RegionManager regionManager;
-
     private SelectionManager selections;
     private VersionAdapter adapter;
-
     private PlayerTracker tracker;
+    private DatabaseManager databaseManager;
+    private StatisticsManager statisticsManager;
 
     public static AFKRegionsPlugin get() {
         return instance;
@@ -50,6 +50,14 @@ public class AFKRegionsPlugin extends JavaPlugin {
         return selections;
     }
 
+    public DatabaseManager database() {
+        return databaseManager;
+    }
+
+    public StatisticsManager statistics() {
+        return statisticsManager;
+    }
+
     @Override
     public void onEnable() {
         instance = this;
@@ -62,6 +70,12 @@ public class AFKRegionsPlugin extends JavaPlugin {
 
         this.messages = new Messages(this);
         this.messages.reload();
+
+        // Inicializar sistema de base de datos
+        this.databaseManager = new DatabaseManager(this);
+
+        // Inicializar sistema de estadísticas
+        this.statisticsManager = new StatisticsManager(this, databaseManager);
 
         this.tracker = new PlayerTracker(this);
 
@@ -86,13 +100,23 @@ public class AFKRegionsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (statisticsManager != null) {
+            statisticsManager.shutdown();
+        }
+
         if (tracker != null) {
             tracker.stop();
+        }
+
+        if (databaseManager != null) {
+            databaseManager.close();
         }
 
         if (adapter != null) {
             adapter.shutdown();
         }
+
+        getLogger().info("AFKRegions disabled.");
     }
 
     public void reloadAll() {
@@ -101,7 +125,13 @@ public class AFKRegionsPlugin extends JavaPlugin {
         messages.reload();
         regionManager.reload();
 
-        tracker.reloadSettings();
+        if (statisticsManager != null) {
+            statisticsManager.reloadConfig();
+        }
+
+        if (tracker != null) {
+            tracker.reloadSettings();
+        }
     }
 
     private boolean hasClass(String className) {

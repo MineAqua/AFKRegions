@@ -1,4 +1,3 @@
-
 package net.mineaqua.afkregions.runtime;
 
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -7,12 +6,7 @@ import net.mineaqua.afkregions.model.Region;
 import net.mineaqua.afkregions.model.RegionReward;
 import net.mineaqua.afkregions.version.VersionAdapter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -23,16 +17,19 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-public class PlayerTracker implements Listener {
+public class PlayerTracker {
     private final Map<UUID, State> states = new HashMap<>();
     private final AFKRegionsPlugin plugin;
     private final VersionAdapter adapter;
 
     private int tickInterval;
-    private int taskId = -1;
+    private int regionCheckInterval; // Nueva variable para el intervalo de verificación de regiones
+    private int rewardTaskId = -1;
+    private int regionCheckTaskId = -1; // Nueva tarea para verificar regiones
 
     private boolean resetOnExit;
     private boolean debug;
+    private boolean rewardMsgEnabled;
 
     private void debug(String text) {
         if (debug) plugin.getLogger().info("[DEBUG] " + text);
@@ -43,31 +40,47 @@ public class PlayerTracker implements Listener {
         this.adapter = plugin.adapter();
 
         reloadSettings();
-        Bukkit.getPluginManager().registerEvents(this, plugin);
 
         this.debug = plugin.getConfig().getBoolean("settings.debug", false);
     }
 
     public void reloadSettings() {
         this.tickInterval = Math.max(1, plugin.getConfig().getInt("settings.tick_interval", 20));
+        // Nuevo: intervalo para verificar regiones (por defecto cada 10 ticks = 0.5 segundos)
+        this.regionCheckInterval = Math.max(1, plugin.getConfig().getInt("settings.region_check_interval", 10));
         this.resetOnExit = plugin.getConfig().getBoolean("settings.reset_on_exit", true);
+        this.rewardMsgEnabled = plugin.getConfig().getBoolean("settings.reward_message_enabled", true);
     }
 
     public void start() {
-        if (taskId != -1) return;
+        if (rewardTaskId != -1 || regionCheckTaskId != -1) return;
 
-        taskId = new BukkitRunnable() {
+        // Tarea para manejar recompensas y progreso
+        rewardTaskId = new BukkitRunnable() {
             @Override
             public void run() {
-                tick();
+                tickRewards();
             }
         }.runTaskTimer(plugin, tickInterval, tickInterval).getTaskId();
+
+        // Nueva tarea optimizada para verificar regiones
+        regionCheckTaskId = new BukkitRunnable() {
+            @Override
+            public void run() {
+                checkPlayerRegions();
+            }
+        }.runTaskTimer(plugin, regionCheckInterval, regionCheckInterval).getTaskId();
     }
 
     public void stop() {
-        if (taskId != -1) {
-            Bukkit.getScheduler().cancelTask(taskId);
-            taskId = -1;
+        if (rewardTaskId != -1) {
+            Bukkit.getScheduler().cancelTask(rewardTaskId);
+            rewardTaskId = -1;
+        }
+
+        if (regionCheckTaskId != -1) {
+            Bukkit.getScheduler().cancelTask(regionCheckTaskId);
+            regionCheckTaskId = -1;
         }
 
         for (State state : states.values()) {
@@ -76,7 +89,69 @@ public class PlayerTracker implements Listener {
         states.clear();
     }
 
-    private void tick() {
+    // Nueva función optimizada para verificar regiones de todos los jugadores
+    private void checkPlayerRegions() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!player.isOnline()) continue;
+
+            Region currentRegion = findRegionAt(player);
+
+            State state = states.computeIfAbsent(player.getUniqueId(), k -> new State(player));
+            Region previousRegion = state.region();
+
+            if (!Objects.equals(previousRegion, currentRegion)) {
+                handleRegionChange(player, state, previousRegion, currentRegion);
+            }
+        }
+    }
+
+    // Función optimizada para encontrar una región en una posición específica
+    private Region findRegionAt(Player player) {
+        for (Region region : plugin.regions().candidates(player.getWorld().getName(), player.getLocation().getBlockX(), player.getLocation().getBlockZ())) {
+            if (region.contains(player.getWorld().getName(), player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ())) {
+                return region;
+            }
+        }
+        return null;
+    }
+
+    // Función separada para manejar cambios de región
+    private void handleRegionChange(Player player, State state, Region previousRegion, Region currentRegion) {
+        if (previousRegion != null) {
+            // Guardar el tiempo AFK antes de salir de la región
+            if (plugin.statistics().isEnabled()) {
+                int secondsInRegion = state.elapsed() / 20;
+                if (secondsInRegion > 0) {
+                    plugin.statistics().addAFKTime(player.getUniqueId(), player.getName(), secondsInRegion);
+                    if (debug) debug("Saved " + secondsInRegion + " AFK seconds for player " + player.getName());
+                }
+            }
+
+            adapter.onExit(player, previousRegion);
+            if (resetOnExit) {
+                state.elapsed(0);
+            }
+
+            state.firedSeconds().clear();
+            player.sendMessage(plugin.messages().msg("left_region").replace("{region}", previousRegion.name()));
+
+            if (debug) debug("Player " + player.getName() + " left region: " + previousRegion.name());
+        }
+
+        state.region(currentRegion);
+
+        if (currentRegion != null) {
+            state.elapsed(0);
+            state.firedSeconds().clear();
+            adapter.onEnter(player, currentRegion);
+            player.sendMessage(plugin.messages().msg("entered_region").replace("{region}", currentRegion.name()));
+
+            if (debug) debug("Player " + player.getName() + " entered region: " + currentRegion.name());
+        }
+    }
+
+    // Función renombrada para claridad - solo maneja recompensas y progreso
+    private void tickRewards() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             State state = states.get(player.getUniqueId());
             if (state == null || state.region() == null) {
@@ -140,7 +215,9 @@ public class PlayerTracker implements Listener {
 
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
                         if (debug) debug("  fired at=" + atSec + "s cmd=" + cmd);
-                        player.sendMessage(plugin.messages().msg("reward_given").replace("{command}", cmd));
+                        if (rewardMsgEnabled) {
+                            player.sendMessage(plugin.messages().msg("reward_given").replace("{command}", cmd));
+                        }
                     }
                 }
 
@@ -152,81 +229,9 @@ public class PlayerTracker implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMove(PlayerMoveEvent event) {
-        if (event.getFrom().getBlockX() == event.getTo().getBlockX()
-                && event.getFrom().getBlockY() == event.getTo().getBlockY()
-                && event.getFrom().getBlockZ() == event.getTo().getBlockZ()
-                && event.getFrom().getWorld().getUID().equals(event.getTo().getWorld().getUID())
-        ) return;
-
-        onBlockChange(event.getPlayer(), event.getTo());
-    }
-
-    private void onBlockChange(Player player, Location location) {
-        int blockX = location.getBlockX(), blockY = location.getBlockY(), blockZ = location.getBlockZ();
-        String world = location.getWorld().getName();
-        Region current = null;
-
-        for (Region region : plugin.regions().candidates(world, blockX, blockZ)) {
-            if (region.contains(world, blockX, blockY, blockZ)) {
-                current = region;
-                break;
-            }
-        }
-
-        State state = states.computeIfAbsent(player.getUniqueId(), k -> new State(player));
-        Region previous = state.region();
-
-        if (!Objects.equals(previous, current)) {
-            if (previous != null) {
-                adapter.onExit(player, previous);
-                if (resetOnExit) {
-                    state.elapsed(0);
-                }
-
-                state.firedSeconds().clear();
-                player.sendMessage(plugin.messages().msg("left_region").replace("{region}", previous.name()));
-            }
-
-            state.region(current);
-
-            if (current != null) {
-                state.elapsed(0);
-                state.firedSeconds().clear();
-                adapter.onEnter(player, current);
-                player.sendMessage(plugin.messages().msg("entered_region").replace("{region}", current.name()));
-            }
-        }
-    }
-
-    public String placeholder(UUID id, String key) {
-        State state = states.get(id);
-        if (state == null || state.region() == null) {
-            return "";
-        }
-        int elapsedSec = state.elapsed() / 20;
-
-        switch (key) {
-            case "region":
-                return state.region().name();
-            case "elapsed":
-                return String.valueOf(elapsedSec);
-
-            case "duration":
-                return String.valueOf(durationSeconds(id));
-            case "progress":
-            case "progress_percent":
-                return String.valueOf(progressPercent(id));
-            case "progress_bar":
-                return progressBar(id);
-            case "time_left":
-                return String.valueOf(timeLeftSeconds(id));
-
-            default:
-                return "";
-        }
-    }
+    // Remover el EventHandler para PlayerMoveEvent ya que ahora usamos una tarea programada
+    // @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    // public void onMove(PlayerMoveEvent event) { ... }
 
     public void refreshRegionRef(String regionName) {
         for (State state : states.values()) {

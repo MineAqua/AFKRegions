@@ -49,12 +49,13 @@ progress_title:
 # ────────────────
 # Help
 # ────────────────
-help_wand: "&b/afkregions wand &7– Select region (left=pos1, right=pos2)"
-help_create: "&b/afkregions create <name> <duration_s> &7– Create region from selection"
-help_reward_list: "&b/afkregions reward list <region>"
-help_reward_add: "&b/afkregions reward add <region> <percent%> <time_s> <command...>"
-help_reward_remove: "&b/afkregions reward remove <region> <index>"
-help_reload: "&b/afkregions reload"
+help_wand: "&e/afkregions wand &7- Get the region selection wand"
+help_create: "&e/afkregions create <name> <duration_seconds> &7- Create a new AFK region"
+help_reward_list: "&e/afkregions reward list <region> &7- List rewards for a region"
+help_reward_add: "&e/afkregions reward add <region> <chance%> <time_s> <command> &7- Add a reward"
+help_reward_remove: "&e/afkregions reward remove <region> <index> &7- Remove a reward"
+help_reload: "&e/afkregions reload &7- Reload the plugin configuration"
+help_stats: "&e/afkregions stats <player|save|info> &7- View statistics or manage system"
 
 # ────────────────
 # Wand / Selection

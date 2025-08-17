@@ -5,7 +5,24 @@ settings:
   title_every_seconds: 1      # Every how much seconds the title will be refreshed. recommended: 1
   reset_on_exit: true # Reset timer on exit of the afk region
   tick_interval: 20 # The update in ticks, 20 = 1s
+  region_check_interval: 10 # The interval in ticks to check player regions, 10 = 0.5s (NEW OPTIMIZED SETTING)
   bossbar_enabled: true # Enable or disable the bossbar. +1.9 feature true/false
-  bossbar_title: "&bAFK &7en &f{region}&7 — &b{elapsed}&7/&f{max} &7({progress%}%)"
+  bossbar_title: "&bAFK &7in &f{region}&7 — &b{elapsed}&7/&f{max} &7({progress%}%)"
   bossbar_color: "BLUE"   # BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
   bossbar_style: "SEGMENTED_10" # Normally I do not recommend modifying this
+  reward_message_enabled: true # Send the reward message on player reward true/false
+
+# Database configuration for storing AFK statistics
+database:
+  enabled: false # Set to true to enable database storage
+  host: "localhost"
+  port: 3306
+  database: "afkregions"
+  username: "root"
+  password: ""
+  use_ssl: false
+
+# Statistics system configuration
+statistics:
+  enabled: true # Set to false to completely disable statistics tracking
+  auto_save_interval_minutes: 5 # How often to save statistics to database (in minutes)

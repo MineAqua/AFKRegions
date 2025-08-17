@@ -33,6 +33,7 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(plugin.messages().msg("help_reward_add"));
             sender.sendMessage(plugin.messages().msg("help_reward_remove"));
             sender.sendMessage(plugin.messages().msg("help_reload"));
+            sender.sendMessage(plugin.messages().msg("help_stats"));
 
             return true;
         }
@@ -43,6 +44,62 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
         }
 
         String sub = args[0].toLowerCase(java.util.Locale.ROOT);
+
+        // ── stats ────────────────────────────────────────────────────────────
+        if (sub.equals("stats")) {
+            if (!plugin.statistics().isEnabled()) {
+                sender.sendMessage("§cStatistics system is disabled.");
+                return true;
+            }
+
+            if (args.length < 2) {
+                sender.sendMessage("§6=== AFK Statistics ===");
+                sender.sendMessage("§e/afkregions stats <player> §7- View player's AFK time");
+                sender.sendMessage("§e/afkregions stats save §7- Force save all statistics");
+                sender.sendMessage("§e/afkregions stats info §7- Show system information");
+                return true;
+            }
+
+            String action = args[1].toLowerCase();
+
+            if (action.equals("save")) {
+                plugin.statistics().saveAllStats();
+                sender.sendMessage("§aForced save of all statistics initiated.");
+                return true;
+            }
+
+            if (action.equals("info")) {
+                sender.sendMessage("§6=== Statistics System Info ===");
+                sender.sendMessage("§eSystem enabled: §a" + plugin.statistics().isEnabled());
+                sender.sendMessage("§eDatabase enabled: §a" + plugin.database().isEnabled());
+                sender.sendMessage("§eCached players: §a" + plugin.statistics().getCachedPlayersCount());
+                sender.sendMessage("§eDatabase connection: §a" + plugin.database().isConnectionValid());
+                return true;
+            }
+
+            // Ver estadísticas de un jugador específico
+            String playerName = args[1];
+            Player target = plugin.getServer().getPlayer(playerName);
+
+            if (target == null) {
+                sender.sendMessage("§cPlayer not found or not online.");
+                return true;
+            }
+
+            long totalSeconds = plugin.statistics().getTotalAFKSeconds(target.getUniqueId());
+            String formattedTime = formatTime(totalSeconds);
+
+            sender.sendMessage("§6=== AFK Statistics for " + target.getName() + " ===");
+            sender.sendMessage("§eTotal AFK time: §a" + formattedTime);
+            sender.sendMessage("§eCurrently AFK: §a" + (plugin.tracker().isAfk(target.getUniqueId()) ? "Yes" : "No"));
+
+            if (plugin.tracker().isAfk(target.getUniqueId())) {
+                sender.sendMessage("§eCurrent region: §a" + plugin.tracker().regionName(target.getUniqueId()));
+                sender.sendMessage("§eTime in current session: §a" + formatTime(plugin.tracker().elapsedSeconds(target.getUniqueId())));
+            }
+
+            return true;
+        }
 
         // ── wand ─────────────────────────────────────────────────────────────
         if (sub.equals("wand")) {
@@ -282,9 +339,25 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             String p = args[0];
-            for (String o : new String[]{"wand", "create", "reward", "reload", "remove", "list"})
+            for (String o : new String[]{"wand", "create", "reward", "reload", "remove", "list", "stats"})
                 if (starts.test(o, p)) out.add(o);
             return out;
+        }
+
+        // /afkregions stats ...
+        if (args.length >= 2 && args[0].equalsIgnoreCase("stats")) {
+            if (args.length == 2) {
+                String p = args[1];
+                // Agregar opciones de estadísticas
+                for (String o : new String[]{"save", "info"}) {
+                    if (starts.test(o, p)) out.add(o);
+                }
+                // Agregar jugadores online
+                for (Player player : plugin.getServer().getOnlinePlayers()) {
+                    if (starts.test(player.getName(), p)) out.add(player.getName());
+                }
+                return out;
+            }
         }
 
         // /afkregions reward ...
@@ -375,5 +448,13 @@ public class AFKRegionsCommand implements CommandExecutor, TabCompleter {
         }
 
         return builder.toString();
+    }
+
+    private String formatTime(long totalSeconds) {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        return String.format("%02dh %02dm %02ds", hours, minutes, seconds);
     }
 }
