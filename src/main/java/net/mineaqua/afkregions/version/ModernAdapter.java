@@ -1,4 +1,3 @@
-
 package net.mineaqua.afkregions.version;
 
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -35,13 +34,13 @@ public class ModernAdapter implements VersionAdapter {
         this.plugin = plugin;
 
         FileConfiguration config = plugin.getConfig();
-        this.titlesEnabled = config.getBoolean("settings.titles_enabled", true);
-        this.titleEvery = Math.max(0, config.getInt("settings.title_every_seconds", 0));
+        this.titlesEnabled = config.getBoolean("ui.titles_enabled", true);
+        this.titleEvery = Math.max(0, config.getInt("ui.title_every_seconds", 0));
 
-        this.bossbarEnabled = config.getBoolean("settings.bossbar_enabled", true);
-        this.barTitleFormat = config.getString("settings.bossbar_title", "{region} {elapsed}/{max} {progress%}%");
-        this.barColor = parseBarColor(config.getString("settings.bossbar_color", "BLUE"));
-        this.barStyle = parseBarStyle(config.getString("settings.bossbar_style", "SEGMENTED_10"));
+        this.bossbarEnabled = config.getBoolean("ui.bossbar_enabled", true);
+        this.barTitleFormat = config.getString("ui.bossbar_title", "{region} {elapsed}/{max} {progress%}%");
+        this.barColor = parseBarColor(config.getString("ui.bossbar_color", "BLUE"));
+        this.barStyle = parseBarStyle(config.getString("ui.bossbar_style", "SEGMENTED_10"));
     }
 
     @Override

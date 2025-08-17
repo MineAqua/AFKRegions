@@ -1,6 +1,6 @@
 name: AFKRegions
 main: net.mineaqua.afkregions.AFKRegionsPlugin
-version: 1.0.0
+version: 1.0.2
 author: Jaimexo
 softdepend: [PlaceholderAPI]
 commands:

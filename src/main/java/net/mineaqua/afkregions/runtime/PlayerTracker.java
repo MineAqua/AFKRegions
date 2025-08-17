@@ -35,21 +35,21 @@ public class PlayerTracker {
         if (debug) plugin.getLogger().info("[DEBUG] " + text);
     }
 
+    public void reloadSettings() {
+        this.tickInterval = Math.max(1, plugin.getConfig().getInt("detection.tick_interval", 20));
+        // Nuevo: intervalo para verificar regiones (por defecto cada 10 ticks = 0.5 segundos)
+        this.regionCheckInterval = Math.max(1, plugin.getConfig().getInt("detection.region_check_interval", 10));
+        this.resetOnExit = plugin.getConfig().getBoolean("general.reset_on_exit", true);
+        this.rewardMsgEnabled = plugin.getConfig().getBoolean("rewards.message_enabled", true);
+    }
+
     public PlayerTracker(AFKRegionsPlugin plugin) {
         this.plugin = plugin;
         this.adapter = plugin.adapter();
 
         reloadSettings();
 
-        this.debug = plugin.getConfig().getBoolean("settings.debug", false);
-    }
-
-    public void reloadSettings() {
-        this.tickInterval = Math.max(1, plugin.getConfig().getInt("settings.tick_interval", 20));
-        // Nuevo: intervalo para verificar regiones (por defecto cada 10 ticks = 0.5 segundos)
-        this.regionCheckInterval = Math.max(1, plugin.getConfig().getInt("settings.region_check_interval", 10));
-        this.resetOnExit = plugin.getConfig().getBoolean("settings.reset_on_exit", true);
-        this.rewardMsgEnabled = plugin.getConfig().getBoolean("settings.reward_message_enabled", true);
+        this.debug = plugin.getConfig().getBoolean("general.debug", false);
     }
 
     public void start() {

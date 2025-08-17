@@ -1,0 +1,83 @@
+# ────────────────
+# General
+# ────────────────
+prefix: "&8[&bAFK&7Regions&8]&r "
+no_perm: "&cNo tienes permisos."
+invalid_args: "&cArgumentos inválidos. Usa &e/afkregions help"
+region_not_found: "&cNo existe la región &f{region}&c."
+reloaded: "&aConfiguración recargada."
+
+# ────────────────
+# Gestión de regiones
+# ────────────────
+created_region: "&aRegión &f{region}&a creada correctamente."
+removed_region: "&cRegión &f{region}&c eliminada."
+list_header: "&7Regiones (&f{count}&7):"
+list_item: " &8- &f{name}&7 @ &f{world}&7 [{min} → {max}] &7/ &f{duration}s &7/ rewards: &f{rewards}"
+
+# ────────────────
+# Eventos de entrada/salida
+# ────────────────
+entered_region: "&7Has entrado a la región &f{region}&7."
+left_region: "&7Has salido de la región &f{region}&7."
+enter_title:
+  title: "&bAFK iniciado"
+  subtitle: "&7Región &f{region}"
+  fadeIn: 5
+  stay: 30
+  fadeOut: 10
+exit_title:
+  title: "&cAFK detenido"
+  subtitle: "&7Has salido de &f{region}"
+  fadeIn: 5
+  stay: 30
+  fadeOut: 10
+
+# ────────────────
+# Recompensas
+# ────────────────
+added_reward: "&aReward agregado a &f{region}&a: &e{spec}"
+reward_given: "&a¡Has recibido una recompensa! &7({command})"
+
+# ────────────────
+# Progreso
+# ────────────────
+progress_title:
+  title: "&bAFK &7{elapsed}/{max}"
+  subtitle: "&7Región &f{region}&7 — &f{progress%}%"
+# ────────────────
+# Ayuda / Help
+# ────────────────
+help_wand: "&b/afkregions wand &7– Seleccionar región (izq=pos1, der=pos2)"
+help_create: "&b/afkregions create <nombre> <duración_s> &7– Crear región con la selección"
+help_reward_list: "&b/afkregions reward list <región>"
+help_reward_add: "&b/afkregions reward add <región> <porcentaje%> <tiempo_s> <comando...>"
+help_reward_remove: "&b/afkregions reward remove <región> <índice>"
+help_reload: "&b/afkregions reload"
+
+# ────────────────
+# Wand / Selección
+# ────────────────
+wand_only_players: "&cSolo jugadores pueden usar este comando."
+wand_given: "&aHacha entregada. &7Clic izquierdo = Pos1, clic derecho = Pos2."
+selection_needed: "&cDebes seleccionar Pos1 y Pos2 con &e/{label} wand&c."
+selection_world_mismatch: "&cPos1 y Pos2 deben estar en el mismo mundo que tú."
+
+# ────────────────
+# Reward (comando)
+# ────────────────
+reward_usage_main: "&eUso: /afkregions reward <list|add|remove> ..."
+reward_list_usage: "&cUso: /afkregions reward list <región>"
+reward_add_usage: "&cUso: /afkregions reward add <región> <porcentaje%> <tiempo_s> <comando...>"
+reward_remove_usage: "&cUso: /afkregions reward remove <región> <índice>"
+percentage_end_percent: "&cEl porcentaje debe terminar en % (ej: 100%)."
+percentage_invalid: "&cPorcentaje inválido."
+time_end_s: "&cEl tiempo debe terminar en 's' (segundos), ej: 10s."
+time_invalid: "&cTiempo inválido."
+time_must_be_ge_zero: "&cEl tiempo debe ser mayor o igual a 0 segundos."
+index_invalid: "&cÍndice inválido."
+index_oob: "&cFuera de rango. Usa &e/afkregions reward list {region}"
+rewards_header: "&aRewards en &e{region}&a:"
+rewards_item: " &8{index}) &7at=&f{at} &7chance=&e{chance}% &7cmd=&f{command}"
+removed_reward: "&aEliminada reward &8#{index} &7(at=&f{at}&7, chance=&e{chance}%&7)."
+subcommand_invalid: "&cSubcomando inválido. Usa: list, add, remove."

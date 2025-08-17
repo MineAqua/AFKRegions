@@ -1,4 +1,3 @@
-
 package net.mineaqua.afkregions.version;
 
 import net.mineaqua.afkregions.AFKRegionsPlugin;
@@ -63,8 +62,8 @@ public class LegacyAdapter implements VersionAdapter {
         this.plugin = plugin;
 
         FileConfiguration config = plugin.getConfig();
-        this.titlesEnabled = config.getBoolean("settings.titles_enabled", true);
-        this.titleEvery = Math.max(0, config.getInt("settings.title_every_seconds", 0));
+        this.titlesEnabled = config.getBoolean("ui.titles_enabled", true);
+        this.titleEvery = Math.max(0, config.getInt("ui.title_every_seconds", 0));
     }
 
     @Override
