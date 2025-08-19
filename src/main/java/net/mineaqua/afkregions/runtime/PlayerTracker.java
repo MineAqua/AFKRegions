@@ -7,6 +7,9 @@ import net.mineaqua.afkregions.model.RegionReward;
 import net.mineaqua.afkregions.version.VersionAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -17,7 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-public class PlayerTracker {
+public class PlayerTracker implements Listener {
     private final Map<UUID, State> states = new HashMap<>();
     private final AFKRegionsPlugin plugin;
     private final VersionAdapter adapter;
@@ -113,6 +116,32 @@ public class PlayerTracker {
             }
         }
         return null;
+    }
+
+    @EventHandler
+    public void onPlayerExit(PlayerQuitEvent event) {
+        if (!plugin.statistics().isEnabled()) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        State state = states.get(player.getUniqueId());
+        if (state == null) {
+            return;
+        }
+
+        Region region = state.region();
+        if (region == null) {
+            return;
+        }
+
+        int secondsInRegion = state.elapsed() / 20;
+        if (secondsInRegion > 0) {
+            plugin.statistics().addAFKTime(player.getUniqueId(), player.getName(), secondsInRegion);
+            if (debug) debug("Saved " + secondsInRegion + " AFK seconds for player " + player.getName());
+        }
+
+        state.elapsed(0);
     }
 
     // Función separada para manejar cambios de región

@@ -84,6 +84,7 @@ public class AFKRegionsPlugin extends JavaPlugin {
 
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SelectionListener(selections), this);
+        pluginManager.registerEvents(tracker, this);
 
         AFKRegionsCommand cmd = new AFKRegionsCommand(this);
         getCommand("afkregions").setExecutor(cmd);
