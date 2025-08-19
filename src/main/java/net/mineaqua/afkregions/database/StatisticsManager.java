@@ -3,6 +3,7 @@ package net.mineaqua.afkregions.database;
 import net.mineaqua.afkregions.AFKRegionsPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -92,7 +93,7 @@ public class StatisticsManager implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (!enabled) return;
 

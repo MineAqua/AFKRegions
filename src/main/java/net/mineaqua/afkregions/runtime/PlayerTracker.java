@@ -8,6 +8,7 @@ import net.mineaqua.afkregions.version.VersionAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -118,7 +119,7 @@ public class PlayerTracker implements Listener {
         return null;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerExit(PlayerQuitEvent event) {
         if (!plugin.statistics().isEnabled()) {
             return;
@@ -141,7 +142,7 @@ public class PlayerTracker implements Listener {
             if (debug) debug("Saved " + secondsInRegion + " AFK seconds for player " + player.getName());
         }
 
-        state.elapsed(0);
+        states.remove(player.getUniqueId());
     }
 
     // Función separada para manejar cambios de región
