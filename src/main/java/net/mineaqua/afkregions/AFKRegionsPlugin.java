@@ -2,6 +2,7 @@ package net.mineaqua.afkregions;
 
 import net.mineaqua.afkregions.database.DatabaseManager;
 import net.mineaqua.afkregions.database.StatisticsManager;
+import net.mineaqua.afkregions.listeners.ItemPickupListener;
 import net.mineaqua.afkregions.papi.AFKRegionsExpansion;
 import net.mineaqua.afkregions.region.RegionManager;
 import net.mineaqua.afkregions.runtime.PlayerTracker;
@@ -25,6 +26,7 @@ public class AFKRegionsPlugin extends JavaPlugin {
     private PlayerTracker tracker;
     private DatabaseManager databaseManager;
     private StatisticsManager statisticsManager;
+    private ItemPickupListener itemPickupListener;
 
     public static AFKRegionsPlugin get() {
         return instance;
@@ -86,6 +88,9 @@ public class AFKRegionsPlugin extends JavaPlugin {
         pluginManager.registerEvents(new SelectionListener(selections), this);
         pluginManager.registerEvents(tracker, this);
 
+        itemPickupListener = new ItemPickupListener(this);
+        pluginManager.registerEvents(itemPickupListener, this);
+
         AFKRegionsCommand cmd = new AFKRegionsCommand(this);
         getCommand("afkregions").setExecutor(cmd);
         getCommand("afkregions").setTabCompleter(cmd);
@@ -132,6 +137,10 @@ public class AFKRegionsPlugin extends JavaPlugin {
 
         if (tracker != null) {
             tracker.reloadSettings();
+        }
+
+        if (itemPickupListener != null) {
+            itemPickupListener.reloadSettings();
         }
     }
 

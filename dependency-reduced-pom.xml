@@ -4,7 +4,7 @@
   <groupId>net.mineaqua</groupId>
   <artifactId>AFKRegions</artifactId>
   <name>AFKRegions</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <build>
     <resources>
       <resource>

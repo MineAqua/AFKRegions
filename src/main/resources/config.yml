@@ -10,6 +10,7 @@
 general:
   debug: false                    # Enable debug logging
   reset_on_exit: true            # Reset timer when leaving AFK region
+  disable_item_interaction: true # Disable item pickup and dropping while in AFK regions
 
 # ================================================================
 #                         REGION DETECTION

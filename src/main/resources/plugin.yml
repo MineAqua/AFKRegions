@@ -1,11 +1,11 @@
 name: AFKRegions
 main: net.mineaqua.afkregions.AFKRegionsPlugin
-version: 1.0.2
+version: 1.0.3
 author: Jaimexo
 softdepend: [PlaceholderAPI]
 commands:
   afkregions:
-    description: Gestiona regiones AFK
+    description: Create AFK regions with rewards and statistics
     usage: "/afkregions <create|pos1|pos2|addreward|list|remove|reload>"
     aliases: [afkr]
 permissions:

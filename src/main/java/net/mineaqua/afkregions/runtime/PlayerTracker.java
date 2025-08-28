@@ -339,7 +339,12 @@ public class PlayerTracker implements Listener {
         return builder.toString();
     }
 
-    private static class State {
+    // Method to provide access to states for ReloadProgressManager
+    public Map<UUID, State> getStates() {
+        return states;
+    }
+
+    static class State {
         private final Player player;
         private Region region;
         private int elapsed;
